@@ -1,19 +1,35 @@
-import React, { useState, useEffect } from "react";
-import "./MainDetails.scss";
+// src/pages/ProductDetails/components/MainDetails/index.jsx
+import React, { useState, useEffect, memo } from "react";
+import "./MainDetails.scss"; // SCSS import qilingan
 import { FaRegStar, FaMinus, FaPlus } from "react-icons/fa";
 import { HalfStarIcon, StarIcon } from "../../../../assets/icons";
 import { FiCheck } from "react-icons/fi";
-import { Button } from "../../../../components";
+import { Button } from "../../../../components"; // Button component import qilingan
+import { useCart } from "../../../../context/CartContext";
+import { toast } from "react-toastify";
 
+// renderStars funksiyasi (o'zgartirilmagan)
 const renderStars = (currentRating) => {
   const stars = [];
+  if (
+    typeof currentRating !== "number" ||
+    currentRating < 0 ||
+    currentRating > 5
+  ) {
+    for (let i = 0; i < 5; i++) {
+      stars.push(
+        <FaRegStar key={`empty-placeholder-${i}`} className="star-icon" />
+      );
+    }
+    return stars;
+  }
   const fullStars = Math.floor(currentRating);
   const hasHalfStar = currentRating % 1 >= 0.5;
 
   for (let i = 0; i < fullStars; i++) {
     stars.push(<StarIcon key={`full-${i}`} className="star-icon filled" />);
   }
-  if (hasHalfStar) {
+  if (hasHalfStar && stars.length < 5) {
     stars.push(<HalfStarIcon key="half" className="star-icon filled" />);
   }
   const emptyStarsCount = 5 - stars.length;
@@ -23,112 +39,126 @@ const renderStars = (currentRating) => {
   return stars;
 };
 
-const MainDetails = ({ product }) => {
-  // product dan kerakli ma'lumotlarni olamiz, size ni ham
+const MainDetails = memo(({ product }) => {
+  const { addToCart } = useCart();
+
   const {
-    id: productId, // Savatga qo'shish uchun
+    id: productId,
     title,
     price,
     oldPrice,
     rating,
     description,
     images = [],
-    size: productSizes = [], // API dan keladigan o'lchamlar, "size" deb nomlangan
-    // Hozircha availableColors statik qoladi, agar API dan kelsa, shuni ham product dan oling
-    availableColors = [
-      { name: "Olive Green", value: "#556B2F", code: "olive" },
-      { name: "Deep Teal", value: "#008080", code: "teal" },
-      { name: "Navy Blue", value: "#000080", code: "navy" },
-    ],
-  } = product || {}; // product undefined bo'lsa, bo'sh obyekt olamiz
+    size: productSizes = [],
+    colors: productColorsAPI = [],
+  } = product || {};
 
-  // State'larni boshlang'ich null yoki bo'sh qiymatlar bilan e'lon qilamiz
-  const [selectedImage, setSelectedImage] = useState("");
+  const defaultStaticColors = [
+    { name: "Dark Olive", value: "#4F5442", code: "dark-olive-detail" },
+    { name: "Deep Navy", value: "#3B425A", code: "deep-navy-detail" },
+    { name: "Steel Blue", value: "#607D8B", code: "steel-blue-detail" },
+  ];
+
+  const availableColors =
+    productColorsAPI && productColorsAPI.length > 0
+      ? productColorsAPI
+      : defaultStaticColors;
+
+  const [selectedImage, setSelectedImage] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  // 1. Mahsulot (product) o'zgarganda state'larni yangilash uchun useEffect
   useEffect(() => {
     if (product) {
-      // product mavjudligini tekshiramiz
-      // Rasmlarni o'rnatish
-      if (images && images.length > 0) {
-        setSelectedImage(images[0]);
-      } else {
-        setSelectedImage("https://via.placeholder.com/600x600?text=No+Image");
-      }
+      setSelectedImage(
+        images && images.length > 0
+          ? images[0]
+          : "https://via.placeholder.com/600x600?text=No+Image"
+      );
 
-      // Ranglarni o'rnatish (agar API dan kelmasa, statik qoladi)
-      if (availableColors && availableColors.length > 0) {
-        setSelectedColor(availableColors[0]?.code || null);
-      } else {
-        setSelectedColor(null);
-      }
+      const currentAvailableColors =
+        productColorsAPI && productColorsAPI.length > 0
+          ? productColorsAPI
+          : defaultStaticColors;
+      setSelectedColor(
+        currentAvailableColors && currentAvailableColors.length > 0
+          ? currentAvailableColors[0]?.code || null
+          : null
+      );
 
-      // O'lchamlarni o'rnatish (API dan kelgan "productSizes" dan)
       if (productSizes && productSizes.length > 0) {
-        // Agar "Large" mavjud bo'lsa, uni tanlaymiz, aks holda birinchisini
-        setSelectedSize(
-          productSizes.includes("Large") ? "Large" : productSizes[0] || null
-        );
+        const defaultSize = productSizes.includes("M")
+          ? "M"
+          : productSizes.includes("L")
+          ? "L"
+          : productSizes.includes("XL")
+          ? "XL"
+          : productSizes.includes("S")
+          ? "S"
+          : productSizes[0] || null;
+        setSelectedSize(defaultSize);
       } else {
         setSelectedSize(null);
       }
-
-      // Miqdorni boshlang'ich holatga keltirish
+      setQuantity(1);
+    } else {
+      setSelectedImage(null);
+      setSelectedColor(null);
+      setSelectedSize(null);
       setQuantity(1);
     }
-  }, [product]); // Bu useEffect faqat "product" o'zgarganda ishga tushadi
+  }, [product]); // Faqat productga bog'liq
 
-  const handleThumbnailClick = (imageSrc) => {
-    setSelectedImage(imageSrc);
-  };
-
-  const handleColorSelect = (colorCode) => {
-    setSelectedColor(colorCode);
-  };
-
-  const handleSizeSelect = (size) => {
-    setSelectedSize(size);
-  };
-
+  const handleThumbnailClick = (imageSrc) => setSelectedImage(imageSrc);
+  const handleColorSelect = (colorCode) => setSelectedColor(colorCode);
+  const handleSizeSelect = (size) => setSelectedSize(size);
   const handleQuantityChange = (amount) => {
-    setQuantity((prev) => Math.max(1, prev + amount));
+    setQuantity((prevQuantity) => Math.max(1, prevQuantity + amount));
   };
 
   const handleAddToCart = () => {
-    if (!selectedSize) {
-      alert("Please select a size.");
+    if (productSizes && productSizes.length > 0 && !selectedSize) {
+      toast.error("Please select a size.");
       return;
     }
-    if (!selectedColor && availableColors && availableColors.length > 0) {
-      // Agar ranglar mavjud bo'lsa-yu tanlanmagan bo'lsa
-      alert("Please select a color.");
+    if (availableColors && availableColors.length > 0 && !selectedColor) {
+      toast.error("Please select a color.");
       return;
     }
-    console.log({
+
+    const productToAdd = {
       productId: productId,
       title: title,
+      price: price,
+      images: images, // To'liq images massivini yuboramiz
       color: selectedColor,
       size: selectedSize,
       quantity: quantity,
-      price: price,
-    });
-    alert(
-      `Added ${quantity} of ${title} (Size: ${selectedSize}${
-        selectedColor ? `, Color: ${selectedColor}` : ""
-      }) to cart!`
-    );
+    };
+    console.log("MainDetails: Product to add to cart:", productToAdd);
+    addToCart(productToAdd);
   };
 
-  // Agar product hali yuklanmagan bo'lsa, loading holatini ko'rsatish mumkin
   if (!product) {
-    return <div>Loading product details...</div>; // Yoki skelet loader
+    return (
+      <div
+        className="loading-details"
+        style={{ padding: "40px", textAlign: "center" }}
+      >
+        Loading product details...
+      </div>
+    );
   }
 
   let discountPercentage = 0;
-  if (oldPrice && price < oldPrice) {
+  if (
+    typeof oldPrice === "number" &&
+    typeof price === "number" &&
+    price < oldPrice &&
+    oldPrice > 0
+  ) {
     discountPercentage = Math.round(((oldPrice - price) / oldPrice) * 100);
   }
 
@@ -136,50 +166,75 @@ const MainDetails = ({ product }) => {
     <div className="main-details">
       <div className="main-details__gallery">
         <div className="main-details__thumbnails">
-          {images.slice(0, 3).map((imgSrc, index) => (
+          {(images || []).slice(0, 3).map((imgSrc, index) => (
             <div
-              key={imgSrc || index} // Agar imgSrc unikal bo'lmasa, index ishlatish mumkin, lekin imgSrc yaxshiroq
+              key={imgSrc || `thumb-${index}-${productId}`}
               className={`thumbnail-item ${
                 selectedImage === imgSrc ? "active" : ""
               }`}
               onClick={() => handleThumbnailClick(imgSrc)}
             >
-              <img src={imgSrc} alt={`${title} thumbnail ${index + 1}`} />
+              {imgSrc ? (
+                <img
+                  src={imgSrc}
+                  alt={`${title || "Product"} thumbnail ${index + 1}`}
+                />
+              ) : (
+                <div
+                  className="thumbnail-placeholder"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "100%",
+                    color: "#ccc",
+                  }}
+                >
+                  ?
+                </div>
+              )}
             </div>
           ))}
         </div>
         <div className="main-details__main-image">
-          <img src={selectedImage} alt={title} />
+          {selectedImage ? (
+            <img src={selectedImage} alt={title || "Product main image"} />
+          ) : (
+            <img
+              src="https://via.placeholder.com/600x600?text=No+Image+Available"
+              alt="Product image placeholder"
+            />
+          )}
         </div>
       </div>
 
       <div className="main-details__info">
-        <h1 className="info__title">{title}</h1>
-
-        <div className="info__rating-price">
-          {rating !== undefined && rating !== null && (
-            <div className="rating-stars">
-              {renderStars(rating)}
-              <span className="rating-value">{rating.toFixed(1)}/5</span>
-            </div>
-          )}
-        </div>
+        <h1 className="info__title">{title || "Product Title"}</h1>
+        {typeof rating === "number" && rating >= 0 && (
+          <div className="info__rating-stars">
+            {renderStars(rating)}
+            <span className="rating-value">{rating.toFixed(1)}/5</span>
+          </div>
+        )}
         <div className="info__price">
-          <span className="current-price">${price?.toFixed(2)}</span>
-          {oldPrice && price < oldPrice && (
+          <span className="current-price">
+            ${typeof price === "number" ? price.toFixed(2) : "N/A"}
+          </span>
+          {typeof oldPrice === "number" && price < oldPrice && (
             <>
               <span className="old-price">${oldPrice.toFixed(2)}</span>
-              <span className="discount-badge">-{discountPercentage}%</span>
+              {discountPercentage > 0 && (
+                <span className="discount-badge">-{discountPercentage}%</span>
+              )}
             </>
           )}
         </div>
-
-        <p className="info__description">{description}</p>
-
-        {/* Rang tanlash */}
+        <p className="info__description">
+          {description || "No description available."}
+        </p>
         {availableColors && availableColors.length > 0 && (
           <div className="info__options-group">
-            <h3 className="options-label">Select Colors</h3>
+            <h3 className="options-label">Select Color</h3>
             <div className="color-selector">
               {availableColors.map((color) => (
                 <button
@@ -189,8 +244,8 @@ const MainDetails = ({ product }) => {
                   }`}
                   style={{ backgroundColor: color.value }}
                   onClick={() => handleColorSelect(color.code)}
-                  aria-label={`Select color ${color.name}`}
-                  title={color.name}
+                  aria-label={`Select color ${color.name || color.code}`}
+                  title={color.name || color.code}
                 >
                   {selectedColor === color.code && (
                     <FiCheck className="check-icon" />
@@ -200,33 +255,39 @@ const MainDetails = ({ product }) => {
             </div>
           </div>
         )}
-
-        {/* O'lcham tanlash (API dan kelgan productSizes dan foydalanamiz) */}
         {productSizes && productSizes.length > 0 && (
           <div className="info__options-group">
             <h3 className="options-label">Choose Size</h3>
             <div className="size-selector">
-              {productSizes.map((size) => (
-                <button
-                  key={size}
-                  className={`size-option ${
-                    selectedSize === size ? "selected" : ""
-                  }`}
-                  onClick={() => handleSizeSelect(size)}
-                >
-                  {size}
-                </button>
-              ))}
+              {["M", "L", "XL", "S"]
+                .filter((size) => productSizes.includes(size))
+                .map(
+                  (
+                    size // Avval mavjudlarini filterlab, keyin map qilamiz
+                  ) => (
+                    <button
+                      key={size}
+                      className={`size-option ${
+                        selectedSize === size ? "selected" : ""
+                      }`}
+                      onClick={() => handleSizeSelect(size)}
+                    >
+                      {size}
+                    </button>
+                  )
+                )}
             </div>
           </div>
         )}
-        <hr className="info__divider" />
-
+        {(availableColors?.length > 0 || productSizes?.length > 0) && (
+          <hr className="info__divider" />
+        )}
         <div className="info__actions">
           <div className="quantity-selector">
             <button
               onClick={() => handleQuantityChange(-1)}
               aria-label="Decrease quantity"
+              disabled={quantity <= 1}
             >
               <FaMinus />
             </button>
@@ -238,13 +299,18 @@ const MainDetails = ({ product }) => {
               <FaPlus />
             </button>
           </div>
-          <Button size="large" px="140" onClick={handleAddToCart}>
+          <Button
+            type="primary"
+            size="large"
+            onClick={handleAddToCart}
+            style={{ flexGrow: 1 }}
+          >
             Add to Cart
           </Button>
         </div>
       </div>
     </div>
   );
-};
+});
 
 export default MainDetails;

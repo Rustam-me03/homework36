@@ -7,24 +7,24 @@
     height: 920px;
     border-radius: 62px;
     background-color: #F0F0F0;
-  
+
     h3 {
         font-family: 'Poppins';
-      margin-top: 70px;
-      font-size: 48px;
-      font-weight: 1000;
+        margin-top: 70px;
+        font-size: 48px;
+        font-weight: 1000;
     }
-  
+
     .img-wrapper {
-      margin-top: 64px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-  
-      .img-row {
+        margin-top: 64px;
         display: flex;
+        flex-direction: column;
         gap: 20px;
-      }
+
+        .img-row {
+            display: flex;
+            gap: 20px;
+        }
     }
 }
 
@@ -55,15 +55,16 @@
         gap: 20px;
 
         .coment-wrapper {
+            overflow: hidden;
             display: flex;
             width: 400px;
             height: 200px;
             border: 1px solid #0000001A;
             border-radius: 20px;
             padding: 30px;
-    
-            .stars { 
-                .star-icon{
+
+            .stars {
+                .star-icon {
                     width: 24px;
                     height: 24px;
                     gap: 10px;

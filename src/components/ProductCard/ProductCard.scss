@@ -1,19 +1,18 @@
 .product-card {
-    background-color: #f8f9fa; // Siz bergan rasmdagi orqa fon rangiga o'xshash
+    background-color: #f8f9fa;
     border-radius: 8px;
-    overflow: hidden; // Rasmning burchaklari chiqib ketmasligi uchun
+    overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    width: 280px; // Taxminiy kenglik, moslashtirishingiz mumkin
+    width: 280px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
 
     &__image-container {
-        position: relative; // Chegirma belgisini joylashtirish uchun
+        position: relative;
         width: 100%;
-        padding-top: 100%; // Kvadrat rasm uchun (1:1 aspect ratio)
-        // Agar rasmlaringiz boshqa nisbatda bo'lsa, o'zgartiring.
-        // Masalan, 4:3 uchun 75%
+        padding-top: 100%;
 
         .product-card__image {
             position: absolute;
@@ -21,8 +20,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; // Rasm konteynerni to'ldirsin, qirqilishi mumkin
-            // object-fit: contain; // Rasm to'liq ko'rinsin, bo'sh joy qolishi mumkin
+            object-fit: cover;
         }
     }
 
@@ -30,7 +28,7 @@
         position: absolute;
         top: 10px;
         right: 10px;
-        background-color: #e53e3e; // Qizil rang
+        background-color: #e53e3e;
         color: white;
         padding: 4px 8px;
         border-radius: 4px;
@@ -43,81 +41,131 @@
     }
 
     &__title {
-        font-size: 16px; // Sizning namunangizdagidek
+        font-size: 16px;
         font-weight: bold;
         color: #212529;
         margin: 0 0 8px 0;
-        white-space: nowrap; // Matn bir qatorga sig'masa
-        overflow: hidden; // Ortqichasi yashirilsin
-        text-overflow: ellipsis; // Oxirida uch nuqta qo'yilsin
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     &__rating {
         display: flex;
         align-items: center;
         margin-bottom: 8px;
-        color: #fdcc0d; // Yulduzchalar uchun sariq rang
+        color: #fdcc0d;
 
         .stars-wrapper {
             display: flex;
-            gap: 2px; // Yulduzchalar orasidagi masofa
+            gap: 2px;
         }
 
         .star-icon {
-            font-size: 16px; // Yulduzcha o'lchami
+            font-size: 16px;
 
             &.filled {
-                color: #fdcc0d; // To'ldirilgan yulduzcha rangi
+                color: #fdcc0d;
             }
         }
 
         .rating-text {
             margin-left: 6px;
             font-size: 14px;
-            color: #495057; // Reyting matni rangi
+            color: #495057;
         }
     }
 
     &__price-info {
         display: flex;
-        align-items: baseline; // Narxlarni bir tekislikda joylashtirish uchun
+        align-items: baseline;
         gap: 8px;
     }
 
     &__current-price {
-        font-size: 20px; // Sizning namunangizdagidek
+        font-size: 20px;
         font-weight: bold;
         color: #212529;
     }
 
     &__old-price {
         font-size: 16px;
-        color: #6c757d; // Kulrang
-        text-decoration: line-through; // Ustidan chizilgan
+        color: #6c757d;
+        text-decoration: line-through;
+    }
+
+    // 🔽 Адаптация
+    @media (max-width: 768px) {
+        width: 100%; // Растянуть на всю ширину
+        border-radius: 6px;
+
+        &__title {
+            font-size: 15px;
+        }
+
+        &__current-price {
+            font-size: 18px;
+        }
+
+        &__old-price {
+            font-size: 14px;
+        }
+
+        &__content {
+            padding: 12px;
+        }
+
+        &__discount-badge {
+            font-size: 11px;
+            padding: 3px 6px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        width: 100%;
+
+        &__title {
+            font-size: 14px;
+        }
+
+        &__rating .rating-text {
+            font-size: 12px;
+        }
+
+        &__current-price {
+            font-size: 16px;
+        }
+
+        &__old-price {
+            font-size: 13px;
+        }
+
+        &__content {
+            padding: 10px;
+        }
+
+        &__discount-badge {
+            font-size: 10px;
+            padding: 2px 5px;
+        }
     }
 }
 
-
+// Hover для ссылки
 .product-card-link {
-    text-decoration: none; // Linkning chiziqchasini olib tashlash
-    color: inherit; // Ota-ona element rangini olish
-    display: block; // Link blok element bo'lishi uchun
+    text-decoration: none;
+    color: inherit;
+    display: block;
 
     &:hover {
         .product-card {
-            // Kartochkaga hover effekti (ixtiyoriy)
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
             transform: translateY(-2px);
         }
     }
 }
 
-.product-card {
-    // ...
-    transition: box-shadow 0.3s ease, transform 0.3s ease; // Hover effekti uchun
-}
-
-// Agar rating bo'lmasa, matn uchun stil
+// Нет рейтинга
 .stars-wrapper.no-rating {
     font-size: 12px;
     color: #888;

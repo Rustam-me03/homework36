@@ -6,58 +6,75 @@
     border-radius: 62px;
     font-size: 16px;
     border: none;
-}
-
-.btn-primary {
-    background-color: black;
-    color: white;
-}
-
-.btn-secondary {
-    background-color: #F0F0F0;
-    color: black;
-}
-
-.btn-white {
-    background-color: white;
-    color: black;
-}
-
-.btn-large {
-    height: 56px;
-    background-color: #000; // Qora tugma
-    color: #fff;
-    border: none;
-    padding: 14px 25px; // Kattaroq padding
-    border-radius: 25px; // Yumaloqroq
-    font-size: 16px;
-    font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease, opacity 0.2s ease;
-    flex-grow: 1; // Mavjud bo'sh joyni egallashi uchun (agar quantity kichik bo'lsa)
 
-    @media (max-width: 480px) {
-        width: 100%; // To'liq kenglik
+    &.btn-primary {
+        background-color: black;
+        color: white;
     }
+
+    &.btn-secondary {
+        background-color: #F0F0F0;
+        color: black;
+    }
+
+    &.btn-white {
+        background-color: white;
+        color: black;
+    }
+
+    &.btn-full {
+        width: 100%;
+    }
+
+    &.p-none {
+        padding: 0 12px;
+    }
+}
+
+// Размеры кнопок
+.btn-large {
+    height: 56px;
+    background-color: #000;
+    color: #fff;
+    padding: 14px 25px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    flex-grow: 1;
 
     &:hover {
         opacity: 0.85;
     }
-
 }
 
 .btn-medium {
     height: 48px;
+    font-size: 15px;
+    padding: 12px 20px;
 }
 
 .btn-small {
     height: 42px;
+    font-size: 14px;
+    padding: 10px 16px;
 }
 
-.button.btn-full {
-    width: 100%;
-}
+// ✅ Адаптация под мобильные экраны
+@media (max-width: 480px) {
 
-.button.p-none {
-    padding: auto 12px;
+    .btn-large,
+    .btn-medium,
+    .btn-small {
+        width: 100%;
+        font-size: 14px;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .button {
+        font-size: 14px;
+        gap: 10px;
+    }
 }

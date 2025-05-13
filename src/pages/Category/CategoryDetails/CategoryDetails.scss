@@ -85,3 +85,100 @@
         }
     }
 }
+
+/* --- Paginatsiya Stili --- */
+.pagination {
+    display: flex;
+    justify-content: space-between; // "Prev" va "Next" chetlarda
+    align-items: center;
+    margin-top: 40px; // Mahsulotlar grididan keyin masofa
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0; // Yuqoridagi kontentdan ajratish
+
+    .page-numbers {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        /* Raqamlar orasidagi masofa */
+    }
+
+    .page-number,
+    .pagination-button {
+        background-color: #f8f9fa;
+        /* Och kulrang fon */
+        border: 1px solid #dee2e6;
+        /* Chegara */
+        color: #495057;
+        /* Matn rangi */
+        padding: 8px 14px;
+        min-width: 40px; // Minimal kenglik
+        text-align: center;
+        border-radius: 6px;
+        /* Burchaklar */
+        cursor: pointer;
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-flex; // Ikonka va matn uchun
+        align-items: center;
+        gap: 5px; // Ikonka va matn orasidagi masofa
+
+        &:hover:not(:disabled) {
+            // Hover effekti (disable bo'lmaganda)
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        &.active {
+            // Aktiv sahifa raqami
+            background-color: #000;
+            /* Qora fon */
+            border-color: #000;
+            color: #fff;
+            /* Oq matn */
+            cursor: default;
+        }
+
+        &:disabled {
+            // Disable tugmalar
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #f8f9fa; // Disable holatda ham fon
+            border-color: #dee2e6;
+        }
+    }
+
+    .dots {
+        padding: 8px 5px;
+        color: #6c757d;
+        min-width: auto; // Kenglikni avtomatik qilish
+    }
+
+    // Previous/Next tugmalari uchun maxsus stillar (agar kerak bo'lsa)
+    // .prev-btn,
+    // .next-btn {
+    //     // Qo'shimcha stillar
+    // }
+}
+
+// Kichik ekranlar uchun paginatsiya stillari
+@media (max-width: 576px) {
+    .pagination {
+        flex-direction: column; // Ustun qilib joylashtirish
+        gap: 15px; // Elementlar orasidagi masofa
+
+        .page-numbers {
+            order: 1; // Raqamlarni o'rtaga qo'yish
+            flex-wrap: wrap; // Agar sig'masa, keyingi qatorga
+            justify-content: center;
+        }
+
+        .prev-btn {
+            order: 0; // "Previous" tepada
+        }
+
+        .next-btn {
+            order: 2; // "Next" pastda
+        }
+    }
+}
